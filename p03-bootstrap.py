@@ -118,7 +118,11 @@ plt.show()
 # if plt.show is not working, try opening the result of plt.savefig instead!
 # plt.savefig("dtree-variance.png") # This doesn't work well on repl.it.
 
+
 TODO("1. understand/compare the bounds generated between the two methods.")
+'''
+The variation of bootstrap is a lot larger but both methods have approximately the same medium
+'''
 TODO("2. Do one of the two following experiments.")
 TODO(
     "2A. Evaluation++: what happens to the variance if we do K bootstrap samples for each of M models?"
@@ -126,3 +130,32 @@ TODO(
 TODO(
     "2B. Return to experimenting on the decision tree: modify the plot to show ~10 max_depths of the decision tree."
 )
+
+
+'''
+2B : show ~10 max depth
+'''
+params = {
+    "criterion": "gini",
+    "splitter": "best",
+}
+
+depth_ = []
+
+for i in range(1,11):
+    new_depth = []
+    for randomness in range(N_MODELS):
+        f_seed = DecisionTreeClassifier(random_state=RANDOM_SEED + randomness, max_depth = i, **params)
+        f_seed.fit(X_train, y_train)
+        new_depth.append(f_seed.score(X_vali, y_vali))
+    depth_.append(new_depth)
+
+boxplot_data: List[List[float]] = depth_
+plt.boxplot(boxplot_data)
+plt.xlabel("Depth 10 for seed based")
+plt.ylabel("Accuracy")
+plt.ylim([0.8, 1.0])
+plt.show()
+# if plt.show is not working, try opening the result of plt.savefig instead!
+# plt.savefig("dtree-variance.png") # This doesn't work well on repl.it.
+
