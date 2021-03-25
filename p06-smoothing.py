@@ -74,8 +74,13 @@ from sklearn.feature_extraction.text import CountVectorizer
 # Note we're doing "CountVectorizer" here and not TfidfVectorizer. Hmm...
 word_features = CountVectorizer(
     strip_accents="unicode",
+    # strip_accents="ascii",
     lowercase=True,
+    # lowercase = False,
     ngram_range=(1, 1),
+    # analyzer = 'char',
+    # analyzer = 'char_wb',
+    # binary = True,
 )
 
 # How does it take a whole paragraph and turn it into words?
@@ -218,12 +223,17 @@ from shared import TODO
 TODO(
     "1. Explore alpha and linear parameters; make a decision about what a good choice for this dataset might be."
 )
+'''
+The alpha range produces great results when it is between 0.1 - 1.0. Linear parameters work best if it is < 0.5. 
+'''
 
 # 2 is once again a choose-your-own:
 TODO(
     "2A. Explore ngrams, lowercase v. uppercase, etc. (how changing CountVectorizer changes performance, or not)"
 )
-TODO(
-    "2B. Explore the difference between today's approaches to the WIKI dataset and yesterday's."
-)
-TODO("2C. Explore the differences between the WIKI dataset and the POETRY dataset.")
+'''
+Lowercase = False, ngram_range = (1, 1) have better performances. 
+I analyzed the data by changing some CountVectorizer parameters like :
+analyzer with char, char_wb, strip_accents to ascii instead, and binary to True instead of the default
+False, and it seemed like setting binary to True improved the performance.
+'''
