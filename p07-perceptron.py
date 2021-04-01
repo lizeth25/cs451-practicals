@@ -240,11 +240,20 @@ print("skP. Vali-Accuracy: {:.3}".format(skP.score(X_vali, y_vali)))
 #
 ## TODO Exploration 1A: Try a MLP (Multi-Layer Perceptron).
 mlp = MLPClassifier(hidden_layer_sizes=(32,))
+
+print("Train sklearn-MLPClassifier(mlp)")
+for iter in tqdm(range(1000)):
+    # Note we use partial_fit rather than fit to expose the loop to our code!
+    mlp.partial_fit(X_train, y_train, classes=(0, 1))
+    learning_curves["MLPClassifier"].add_sample(mlp, X_train, y_train, X_vali, y_vali)
+print("mlp. Train-Accuracy: {:.3}".format(skP.score(X_train, y_train)))
+print("mlp. Vali-Accuracy: {:.3}".format(skP.score(X_vali, y_vali)))
+
 ## TODO Exploration 1B: Try another Linear Model
 sgdc = SGDClassifier()
 
 ## TODO Think: Why can't we make a graph like this for DecisionTreeClassifier?
-
+## A decision tree is not a linear model
 #%% Plot!
 
 #
