@@ -54,6 +54,11 @@ scores = {}
 acc_mean = []
 acc_std = []
 
+# operating over 50 samples instead (TO DO 2)
+samples = list(range(50, N, 50))
+samples.append(N)
+'''
+# Percentage 
 # Which subset of data will potentially really matter.
 for train_percent in percentages:
     n_samples = int((train_percent / 100) * N)
@@ -98,6 +103,55 @@ simple_boxplot(
     ylabel="Accuracy",
     save="graphs/p09-boxplots-Accuracy.png",
 )
+'''
+
+
+# samples 
+# Which subset of data will potentially really matter.
+for sample in samples:
+    n_samples = int(sample)
+    print("{} samples...".format(n_samples))
+    label = "{}".format(n_samples)
+
+    # So we consider num_trials=100 subsamples, and train a model on each.
+    scores[label] = []
+    for i in range(num_trials):
+        X_sample, y_sample = resample(
+            X_train, y_train, n_samples=n_samples, replace=False
+        )  # type:ignore
+        # Note here, I'm using a simple classifier for speed, rather than the best.
+        clf = DecisionTreeClassifier(random_state=RANDOM_SEED + i) #(TO DO 1 + 2)
+        clf.fit(X_sample, y_sample)
+        # so we get 100 scores per percentage-point.
+        scores[label].append(clf.score(X_vali, y_vali))
+    # We'll first look at a line-plot of the mean:
+    acc_mean.append(np.mean(scores[label]))
+    acc_std.append(np.std(scores[label]))
+
+# First, try a line plot, with shaded variance regions:
+import matplotlib.pyplot as plt
+
+means = np.array(acc_mean)
+std = np.array(acc_std)
+plt.plot(samples, acc_mean, "o-")
+plt.fill_between(samples, means - std, means + std, alpha=0.2)
+plt.xlabel("Samples Training Data")
+plt.ylabel("Mean Accuracy")
+plt.xlim([0, N])
+plt.title("Shaded Accuracy Plot")
+plt.savefig("graphs/p09-area-Accuracy_dt.png")
+plt.show()
+
+
+# Second look at the boxplots in-order: (I like this better, IMO)
+simple_boxplot(
+    scores,
+    "Learning Curve",
+    xlabel="Samples Training Data",
+    ylabel="Accuracy",
+    save="graphs/p09-boxplots-Accuracy_dt.png",
+)
+
 
 # TODO: (practical tasks)
 # 1. Swap in a better, but potentially more expensive classifier.
