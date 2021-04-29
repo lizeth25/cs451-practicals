@@ -127,14 +127,22 @@ def make_neural_net(D: int, hidden: List[int], num_classes: int = 2, dropout=0.2
 # 3. Consider a shallower, wider network.
 #    - Changing [16,16] to something else... might require revisiting step 1.
 ##
+'''
+regularization - controls penalization, 
+ learning rate - the amount of steps to take when learning, 
+ momentum - the direction in which the slope is going, 
+ dropout - helps in not overfitting by reducing some  data during training
+
+
+'''
 
 LEARNING_RATE = 1.0
-DROPOUT = 0.2  # randomly turn off this fraction of the neural-net while training.
-MOMENTUM = 0.9
+DROPOUT = 0.3  # randomly turn off this fraction of the neural-net while training.
+MOMENTUM = 0.0
 REGULARIZATION = 0.0  # try 0.1, 0.01, etc.
 
 # two hidden layers, 16 nodes, each.
-model = make_neural_net(D, [16, 16], dropout=DROPOUT)
+model = make_neural_net(D, [32, 32], dropout=DROPOUT)
 objective = nn.CrossEntropyLoss()
 optimizer = optim.SGD(
     model.parameters(), lr=LEARNING_RATE, momentum=MOMENTUM, weight_decay=REGULARIZATION
