@@ -64,7 +64,7 @@ for cfg in configs:
     variants: T.List[ModelInfo] = []
     for class_weights in [None, "balanced"]:
         for c_val in [1.0]:
-            svm = SVMClassifier(C=c_val, class_weight=class_weights, **cfg)
+            svm = SVMClassifier(C=c_val, class_weight=class_weights, gamma=0.5, **cfg)
             svm.fit(X_train, y_train)
             name = "k={}{} C={} {}".format(
                 cfg["kernel"], cfg.get("degree", ""), c_val, class_weights or ""

@@ -31,7 +31,7 @@ def y_to_sign(x: bool) -> int:
 
 @dataclass
 class WeightedEnsemble(ClassifierMixin):
-    """ A weighted ensemble is a list of (weight, classifier) tuples."""
+    """A weighted ensemble is a list of (weight, classifier) tuples."""
 
     members: T.List[T.Tuple[float, T.Any]] = field(default_factory=list)
 
@@ -55,41 +55,51 @@ class WeightedEnsemble(ClassifierMixin):
 
 
 #%%
+for weight_alt in range(5):
+    tree_num = []
+    tree_vali = []
+    forest_vali = []
 
-tree_num = []
-tree_vali = []
-forest_vali = []
+    forest = WeightedEnsemble()
+    (N, D) = X_train.shape
+    for i in range(100):
+        # bootstrap sample the training data
+        X_sample, y_sample = resample(X_train, y_train)  # type:ignore
 
-forest = WeightedEnsemble()
-(N, D) = X_train.shape
-for i in range(100):
-    # bootstrap sample the training data
-    X_sample, y_sample = resample(X_train, y_train)  # type:ignore
+        # TODO create a tree model.
+        tree = DecisionTreeClassifier()
+        tree.fit(X_sample, y_sample)
+        vali_acc = tree.score(X_vali, y_vali)
 
-    # TODO create a tree model.
-    tree = TODO("train and fit a model to the sampled data")
+        # TODO Experiment:
+        # What if instead of every tree having the same 1.0 weight, we considered some alternatives?
+        #  - weight = the accuracy of that tree on the whole training set.
+        #  - weight = the accuracy of that tree on the validation set.
+        #  - weight = random.random()
+        #  - weight = 0.1
+        weight_alts = [
+            1.0,
+            tree.score(X_train, y_train),
+            vali_acc,
+            random.random(),
+            0.1,
+        ]
+        weight = weight_alts[weight_alt]
 
-    # TODO Experiment:
-    # What if instead of every tree having the same 1.0 weight, we considered some alternatives?
-    #  - weight = the accuracy of that tree on the whole training set.
-    #  - weight = the accuracy of that tree on the validation set.
-    #  - weight = random.random()
-    #  - weight = 0.1
-    weight = 1.0
+        # hold onto it for voting
+        forest.insert(weight, tree)
 
-    # hold onto it for voting
-    forest.insert(weight, tree)
+        tree_num.append(i)
+        tree_vali.append(tree.score(X_vali, y_vali))
+        forest_vali.append(forest.score(X_vali, y_vali))
+        if i % 5 == 0:
+            print("Tree[{}] = {:.3}".format(i, tree_vali[-1]))
+            print("Forest[{}] = {:.3}".format(i, forest_vali[-1]))
 
-    tree_num.append(i)
-    tree_vali.append(tree.score(X_vali, y_vali))
-    forest_vali.append(forest.score(X_vali, y_vali))
-    if i % 5 == 0:
-        print("Tree[{}] = {:.3}".format(i, tree_vali[-1]))
-        print("Forest[{}] = {:.3}".format(i, forest_vali[-1]))
+    import matplotlib.pyplot as plt
 
-import matplotlib.pyplot as plt
-
-plt.plot(tree_num, tree_vali, label="Individual Trees", alpha=0.5)
-plt.plot(tree_num, forest_vali, label="Random Forest")
-plt.legend()
-plt.show()
+    plt.plot(tree_num, tree_vali, label="Individual Trees", alpha=0.5)
+    plt.plot(tree_num, forest_vali, label="Random Forest")
+    plt.legend()
+    plt.title("Weight : {}".format(weight))
+    plt.show()
