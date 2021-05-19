@@ -63,15 +63,22 @@ class ModelInfo:
 for cfg in configs:
     variants: T.List[ModelInfo] = []
     for class_weights in [None, "balanced"]:
-        for c_val in [1.0]:
-            svm = SVMClassifier(C=c_val, class_weight=class_weights, gamma=0.5, **cfg)
-            svm.fit(X_train, y_train)
-            name = "k={}{} C={} {}".format(
-                cfg["kernel"], cfg.get("degree", ""), c_val, class_weights or ""
-            )
-            accuracy = svm.score(X_vali, y_vali)
-            print("{}. score= {:.3}".format(name, accuracy))
-            variants.append(ModelInfo(name, accuracy, svm))
+        for c_val in [1.0, 2.0, 3.0]:
+            for gamma_val in [0.1, 0.5, 0.7, 0.9, 1.0]:
+                svm = SVMClassifier(
+                    C=c_val, class_weight=class_weights, gamma=gamma_val, **cfg
+                )
+                svm.fit(X_train, y_train)
+                name = "k={}{} C={} {}".format(
+                    cfg["kernel"],
+                    cfg.get("degree", ""),
+                    gamma_val,
+                    c_val,
+                    class_weights or "",
+                )
+                accuracy = svm.score(X_vali, y_vali)
+                print("{}. score= {:.3}".format(name, accuracy))
+                variants.append(ModelInfo(name, accuracy, svm))
     best = max(variants, key=lambda x: x.accuracy)
     graphs[best.name] = bootstrap_accuracy(best.model, X_vali, y_vali)
 
